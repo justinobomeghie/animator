@@ -20,19 +20,16 @@ fn fan(n: Int, start: Point) -> List(Path) {
     "square_spiral",
     "fn draw(shape_slider: Int) -> List(Path) {
   let turns = 20 + shape_slider / 4
-  spiral(Point(0, 0), Point(1, 0), 0, turns)
+  spiral(Point(0, 0), Point(1, 0), 0, turns, [])
 }
 
-fn spiral(p: Point, d: Point, i: Int, n: Int) -> List(Path) {
+fn spiral(p: Point, d: Point, i: Int, n: Int, acc: List(Path)) -> List(Path) {
   case i == n {
-    True -> []
+    True -> acc
     False -> {
       let len = { i / 2 + 1 } * 24
       let q = Point(p.x + d.x * len, p.y + d.y * len)
-      [
-        Path(Line(p, q), i * 3, i * 3 + 3, 3),
-        ..spiral(q, Point(0 - d.y, d.x), i + 1, n)
-      ]
+      spiral(q, Point(0 - d.y, d.x), i + 1, n, [Path(Line(p, q), i * 3, i * 3 + 3, 3), ..acc])
     }
   }
 }
