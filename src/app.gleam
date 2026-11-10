@@ -204,7 +204,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       case run_source(model.shape_slider, source) {
         Ok(paths) -> {
           let rendered =
-            list.map(paths, fn(path) { render.render_path(path, "#d4c5a0") })
+            list.map(paths, fn(path) { render.render_path(path, "#c87998") })
           render.set_drawing(rendered)
           #(Model(..model, output: ""), effect.none())
         }
@@ -222,7 +222,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           case run_source(shape_slider, model.source) {
             Ok(paths) -> {
               render.set_drawing(
-                list.map(paths, fn(path) { render.render_path(path, "#d4c5a0") }),
+                list.map(paths, fn(path) { render.render_path(path, "#c87998") }),
               )
               #(Model(..model, output: ""), effect.none())
             }
