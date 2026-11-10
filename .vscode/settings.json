@@ -1,0 +1,12 @@
+{
+  "chat.disableAIFeatures": false,
+  "chat.commandCenter.enabled": false,
+  "github.copilot.enable": {
+    "*": false
+  },
+  "editor.inlineSuggest.enabled": false,
+  "terminal.integrated.shellIntegration.enabled": true,
+  "[gleam]": {
+    "editor.formatOnSave": true
+  }
+}

@@ -1,0 +1,9 @@
+My extension will improve the Animator application by adding more interactive
+drawing controls and making it easier to experiment with generated animations.
+The interface will provide controls for selecting a drawing, changing the
+shape parameter, and adjusting playback speed. These controls will allow users
+to explore how different inputs affect the output without having to edit the
+program every time. I also plan to improve the visual presentation of the
+animation area so that the drawing is clear and easy to follow. The goal of
+these additions is to make the application more accessible to beginners while
+preserving the flexibility of writing custom drawing programs in Gleam.

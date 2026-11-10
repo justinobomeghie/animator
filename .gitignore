@@ -1,0 +1,6 @@
+build/
+public/
+.server_logs/
+.provenance/
+*.backup.*
+*.phase2-backup
