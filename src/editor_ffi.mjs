@@ -62,37 +62,37 @@ function loadCodeMirror() {
     const { tags: t } = highlight;
     const theme = view.EditorView.theme(
       {
-        "&": { color: "#d4c5a0", backgroundColor: "#0d0d1a", height: "100%" },
+        "&": { color: "#795463", backgroundColor: "#fff9fb", height: "100%" },
         ".cm-content": {
           fontFamily: "monospace",
           fontSize: "13px",
           padding: "16px 0",
         },
         ".cm-gutters": {
-          backgroundColor: "#0d0d1a",
-          color: "#3a3a5e",
+          backgroundColor: "#fff9fb",
+          color: "#a16f84",
           border: "none",
         },
-        ".cm-activeLine": { backgroundColor: "#16162c" },
-        ".cm-activeLineGutter": { backgroundColor: "#16162c" },
+        ".cm-activeLine": { backgroundColor: "#fceef2" },
+        ".cm-activeLineGutter": { backgroundColor: "#fceef2" },
         "&.cm-focused .cm-matchingBracket": {
-          backgroundColor: "#2a4a3a",
+          backgroundColor: "#f1cfdb",
           color: "#fff",
         },
         ".cm-scroller": { overflow: "auto" },
-        "&.cm-focused": { outline: "1px solid #6a6aaa" },
+        "&.cm-focused": { outline: "1px solid #edcbd7" },
       },
-      { dark: true },
+      { dark: false },
     );
     const highlightStyle = language.HighlightStyle.define([
-      { tag: t.keyword, color: "#c792ea" },
-      { tag: t.comment, color: "#6a7a6a", fontStyle: "italic" },
-      { tag: t.string, color: "#c3e88d" },
-      { tag: t.number, color: "#f78c6c" },
-      { tag: [t.atom, t.bool], color: "#82aaff" },
-      { tag: t.typeName, color: "#ffcb6b" },
-      { tag: t.variableName, color: "#d4c5a0" },
-      { tag: t.operator, color: "#89ddff" },
+      { tag: t.keyword, color: "#b45e7b" },
+      { tag: t.comment, color: "#aa8996", fontStyle: "italic" },
+      { tag: t.string, color: "#a45e7b" },
+      { tag: t.number, color: "#bd829a" },
+      { tag: [t.atom, t.bool], color: "#87566c" },
+      { tag: t.typeName, color: "#c87998" },
+      { tag: t.variableName, color: "#795463" },
+      { tag: t.operator, color: "#d78da8" },
     ]);
     const gleam = defineGleam(language.StreamLanguage);
 
