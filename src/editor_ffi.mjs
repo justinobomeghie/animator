@@ -62,37 +62,38 @@ function loadCodeMirror() {
     const { tags: t } = highlight;
     const theme = view.EditorView.theme(
       {
-        "&": { color: "#795463", backgroundColor: "#fff9fb", height: "100%" },
+        "&": { color: "#75465b", backgroundColor: "#fff9fb", height: "100%" },
         ".cm-content": {
           fontFamily: "monospace",
           fontSize: "13px",
           padding: "16px 0",
+          caretColor: "#c87998",
         },
         ".cm-gutters": {
           backgroundColor: "#fff9fb",
-          color: "#a16f84",
+          color: "#bd829a",
           border: "none",
         },
-        ".cm-activeLine": { backgroundColor: "#fceef2" },
-        ".cm-activeLineGutter": { backgroundColor: "#fceef2" },
+        ".cm-activeLine": { backgroundColor: "#fbedf2" },
+        ".cm-activeLineGutter": { backgroundColor: "#fbedf2" },
         "&.cm-focused .cm-matchingBracket": {
-          backgroundColor: "#f1cfdb",
-          color: "#fff",
+          backgroundColor: "#f8e1e9",
+          color: "#87566c",
         },
         ".cm-scroller": { overflow: "auto" },
-        "&.cm-focused": { outline: "1px solid #edcbd7" },
+        "&.cm-focused": { outline: "1px solid #eac2d1" },
       },
       { dark: false },
     );
     const highlightStyle = language.HighlightStyle.define([
       { tag: t.keyword, color: "#b45e7b" },
-      { tag: t.comment, color: "#aa8996", fontStyle: "italic" },
-      { tag: t.string, color: "#a45e7b" },
-      { tag: t.number, color: "#bd829a" },
-      { tag: [t.atom, t.bool], color: "#87566c" },
-      { tag: t.typeName, color: "#c87998" },
-      { tag: t.variableName, color: "#795463" },
-      { tag: t.operator, color: "#d78da8" },
+      { tag: t.comment, color: "#bd829a", fontStyle: "italic" },
+      { tag: t.string, color: "#9c5a78" },
+      { tag: t.number, color: "#c87998" },
+      { tag: [t.atom, t.bool], color: "#a45e7b" },
+      { tag: t.typeName, color: "#87566c" },
+      { tag: t.variableName, color: "#75465b" },
+      { tag: t.operator, color: "#a16f84" },
     ]);
     const gleam = defineGleam(language.StreamLanguage);
 
