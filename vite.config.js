@@ -1,5 +1,8 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: '/animator/',
+  base: "/animator/",
+  build: {
+    outDir: "dist",
+  },
 });
