@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: "/animator/",
+  base: "./",
   build: {
     outDir: "docs",
   },
