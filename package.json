@@ -1,0 +1,12 @@
+{
+  "name": "animator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "gleam build --target=javascript && vite build",
+    "dev": "gleam build --target=javascript && vite"
+  },
+  "devDependencies": {
+    "vite": "^5.4.21"
+  }
+}
