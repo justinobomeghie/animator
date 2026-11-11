@@ -1,5 +1,5 @@
-import mutable_dict
 import evaluator
+import mutable_dict
 
 pub const builtins = [
   #(
