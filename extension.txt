@@ -1,9 +1,18 @@
-My extension will improve the Animator application by adding more interactive
-drawing controls and making it easier to experiment with generated animations.
-The interface will provide controls for selecting a drawing, changing the
-shape parameter, and adjusting playback speed. These controls will allow users
-to explore how different inputs affect the output without having to edit the
-program every time. I also plan to improve the visual presentation of the
-animation area so that the drawing is clear and easy to follow. The goal of
-these additions is to make the application more accessible to beginners while
-preserving the flexibility of writing custom drawing programs in Gleam.
+My Phase 3 extension adds a new built-in drawing called
+Coquette Squirrel to the Animator application. The scene features a cute
+squirrel with a large curled tail, a little face, and several decorative bows.
+The surrounding garden includes cherry blossom trees, hanging cherries,
+flowers, grass, and a speech bubble with the message JUSTIN!!.
+
+The illustration is constructed from the Animator language's existing Point,
+Line, and Path drawing primitives. Its paths appear in timed groups so that
+the garden and squirrel are revealed progressively instead of appearing as
+one static picture. The existing Shape slider also changes the thickness of
+the drawing's lines, while the Speed slider continues to control playback.
+
+I updated the built-in drawing library so the new squirrel drawing is
+available in the drawing selector, including for browsers that already have
+saved drawings. The existing editor, drawing controls, and animation
+functionality are preserved. This extension adds a playful illustrated
+scene while demonstrating how the Animator language can create a more
+detailed drawing from simple geometric paths.

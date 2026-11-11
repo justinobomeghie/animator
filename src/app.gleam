@@ -134,7 +134,15 @@ pub fn init(_flags: Nil) -> #(Model, Effect(Msg)) {
   let drawings = case data.storage_get(library_key) {
     Ok(saved) ->
       case json.parse(from: saved, using: library_decoder()) {
-        Ok(restored) if restored != [] -> restored
+        Ok(restored) if restored != [] ->
+          list.append(
+            restored,
+            list.filter(examples.all, fn(example) {
+              case example {
+                #(name, _) -> !has_drawing(restored, name)
+              }
+            }),
+          )
         _ -> examples.all
       }
     Error(_) -> examples.all
