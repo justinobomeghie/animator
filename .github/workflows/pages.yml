@@ -35,9 +35,10 @@ jobs:
 
       - name: Assemble site
         run: |
-          mkdir -p site/build/dev
-          cp index.html animator.css site/
-          cp -R build/dev/javascript site/build/dev/
+          mkdir -p "site/builds/${GITHUB_SHA}/javascript"
+          cp animator.css site/
+          sed "s#./build/dev/javascript/#./builds/${GITHUB_SHA}/javascript/#g" index.html > site/index.html
+          cp -R build/dev/javascript/. "site/builds/${GITHUB_SHA}/javascript/"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
