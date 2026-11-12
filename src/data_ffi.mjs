@@ -1,7 +1,7 @@
 // The browser features behind data.gleam.
 
 import { Result$Ok, Result$Error } from "./gleam.mjs";
-import { List$Empty$const, toList } from "./gleam.mjs";
+import { List$Empty, toList } from "./gleam.mjs";
 
 // localStorage can throw: when the browser blocks it for this site, or (on a
 // write) when the site is out of space.
@@ -40,9 +40,9 @@ export function loadDrawings() {
       && item.length === 2
       && typeof item[0] === "string"
       && typeof item[1] === "string");
-    return toList(pairs, List$Empty$const);
+    return toList(pairs, List$Empty());
   } catch {
-    return List$Empty$const;
+    return List$Empty();
   }
 }
 
