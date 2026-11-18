@@ -26,13 +26,13 @@ import shape.{type Path}
 pub const public_url = "https://justinobomeghie.github.io/animator/"
 
 /// Set to True if you would like your app's URL included in the course gallery.
-pub const include_app_in_gallery = False
+pub const include_app_in_gallery = True
 
 /// A link to your video from Problem 14, which anyone with the link can watch.
-pub const video_url = ""
+pub const video_url = "https://drive.google.com/file/d/1uEDKN0eMf7FgvrssOKY9apIkBgQ-6lOn/view?usp=sharing"
 
 /// Set to True if you would like your video included in the course gallery.
-pub const include_video_in_gallery = False
+pub const include_video_in_gallery = True
 
 const default_code = "fn draw(shape_slider: Int) -> List(Path) {\n  [Path(Line(Point(0, 0), Point(100, 100)), 0, 10, 2)]\n}\n"
 
@@ -143,7 +143,16 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       #(next, draw_effect(next))
     }
     SpeedChanged(value) -> {
-      let speed = result.unwrap(float.parse(value), model.speed)
+      // Range inputs emit whole-number strings at the endpoints ("-3" and
+      // "3"), which float.parse does not accept. Parse as an integer so the
+      // full reverse-to-fast range works, including the initial whole values.
+      let speed = case float.parse(value) {
+        Ok(speed) -> speed
+        Error(_) -> case int.parse(value) {
+          Ok(speed) -> int.to_float(speed)
+          Error(_) -> model.speed
+        }
+      }
       #(Model(..model, speed:), effect.from(fn(_) { render.set_speed(speed) }))
     }
     Play -> #(model, effect.from(fn(_) { render.set_speed(model.speed) }))
@@ -166,24 +175,35 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
 
-    // After each keystroke in the editor, evaluate user code and report errors.
-    SetCode(text) ->
+    // After each keystroke in the editor, save the source even while it is
+    // temporarily incomplete. Editors commonly pass through invalid syntax as
+    // the user types, and that text must still survive a reload.
+    SetCode(text) -> {
+      let library = list.map(model.library, fn(d) {
+        case d.0 == model.selected {
+          True -> #(d.0, text)
+          False -> d
+        }
+      })
+      let edited = Model(..model, source: text, library:)
+      let save = persist(edited)
       case run_source(model.shape_slider, text) {
         // Parsed and evaluated: show the result.
         Ok(paths) -> #(
-          Model(..model, output: "", source: text, library: list.map(model.library, fn(d) { case d.0 == model.selected { True -> #(d.0, text) False -> d } })),
+          Model(..edited, output: ""),
           effect.batch([effect.from(fn(_) {
             render.set_drawing(paths_for_canvas(paths, model.selected))
             render.set_speed(model.speed)
             render.set_looping(model.selected == "storybook_flower")
-          }), persist(Model(..model, source: text, library: list.map(model.library, fn(d) { case d.0 == model.selected { True -> #(d.0, text) False -> d } })))]),
+          }), save]),
         )
         // Broken (parse or evaluation): show the error.
         Error(msg) -> #(
-          Model(..model, output: msg, source: text),
-          effect.none(),
+          Model(..edited, output: msg),
+          save,
         )
       }
+    }
   }
 }
 

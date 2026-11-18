@@ -1,29 +1,82 @@
-// The browser features behind data.gleam.
-
 import { Result$Ok, Result$Error } from "./gleam.mjs";
 import { List$Empty, toList } from "./gleam.mjs";
 
-// localStorage can throw: when the browser blocks it for this site, or (on a
-// write) when the site is out of space.
-export function storageGet(key) {
+const memoryStorage = new Map();
+
+function browserStorage(name) {
   try {
-    const value = globalThis.localStorage.getItem(key);
-    return value === null ? Result$Error(undefined) : Result$Ok(value);
+    if (typeof window === "undefined") return null;
+    return window[name] ?? null;
   } catch {
-    return Result$Error(undefined);
+    return null;
   }
+}
+
+export function storageGet(key) {
+  const persistent = browserStorage("localStorage");
+
+  try {
+    if (persistent) {
+      const value = persistent.getItem(key);
+      if (value !== null) return Result$Ok(value);
+    }
+  } catch (error) {
+    console.warn("Could not read localStorage:", error);
+  }
+
+  const session = browserStorage("sessionStorage");
+
+  try {
+    if (session) {
+      const value = session.getItem(key);
+      if (value !== null) return Result$Ok(value);
+    }
+  } catch (error) {
+    console.warn("Could not read sessionStorage:", error);
+  }
+
+  if (memoryStorage.has(key)) {
+    return Result$Ok(memoryStorage.get(key));
+  }
+
+  return Result$Error(undefined);
 }
 
 export function storageSet(key, value) {
+  let saved = false;
+
+  const persistent = browserStorage("localStorage");
+
   try {
-    globalThis.localStorage.setItem(key, value);
+    if (persistent) {
+      persistent.setItem(key, value);
+      saved = true;
+    }
   } catch (error) {
-    console.error(`Couldn't save: ${error.message}`);
+    console.warn("Could not save to localStorage:", error);
+  }
+
+  const session = browserStorage("sessionStorage");
+
+  if (!saved) {
+    try {
+      if (session) {
+        session.setItem(key, value);
+        saved = true;
+      }
+    } catch (error) {
+      console.warn("Could not save to sessionStorage:", error);
+    }
+  }
+
+  // Last-resort fallback for restricted environments and test runners.
+  if (!saved) {
+    memoryStorage.set(key, value);
   }
 }
 
-// Ask the user to name a new drawing; "" (empty string) means they cancelled.
 export function promptDrawingName() {
+  if (typeof window === "undefined") return "";
   const name = window.prompt("Name for the new drawing:");
   return name === null ? "" : name;
 }

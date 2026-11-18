@@ -16,6 +16,7 @@ let cmView = null; // the live EditorView, or null when no editor is mounted
 let cmOnChange = null; // Gleam callback: receives the document text on every edit
 let cmModulePromise = null; // cached import of the CodeMirror bundle
 let cmObserver = null; // watches the page for a replaced mount node (see reattachEditor)
+let mountGeneration = 0; // prevents an older async mount from replacing a newer drawing
 
 // Lezer highlight-tag → token-name mapping for our hand-written Gleam tokenizer.
 // (The grammar itself is small enough that a StreamLanguage tokenizer is simpler
@@ -163,6 +164,7 @@ function reattachEditor() {
 }
 
 export function mountEditor(initialText, onChange) {
+  const generation = ++mountGeneration;
   // Tear down any editor from a previous drawing first, so mounting is
   // self-contained: switching drawings just calls this again.
   if (cmView) {
@@ -177,14 +179,15 @@ export function mountEditor(initialText, onChange) {
   // The mount effect can run before Lustre has committed the #code-editor
   // node to the DOM, so wait for it to appear before loading CodeMirror.
   waitForElement("code-editor", 120).then((mount) => {
-    if (!mount) return; // editor closed before the node ever appeared
+    if (!mount || generation !== mountGeneration) return; // superseded or closed
     loadCodeMirror()
       .then((CM) => {
+        if (generation !== mountGeneration) return;
         const el = document.getElementById("code-editor");
         if (!el) return; // editor was closed before CodeMirror finished loading
         el.innerHTML = "";
         cmView = CM.create(el, initialText, (t) => {
-          if (cmOnChange) cmOnChange(t);
+          if (generation === mountGeneration && cmOnChange) cmOnChange(t);
         });
       })
       .catch((e) => console.error("CodeMirror failed to load:", e));
