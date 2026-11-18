@@ -14,6 +14,7 @@
 //// needs, so a question's tests should all pass once that question is done
 //// (assuming the earlier ones are).
 
+import app_controls_test as app_controls
 import autograders
 import evaluator_test as evaluator
 import extension_test as extension
@@ -247,9 +248,21 @@ pub fn main() -> Nil {
     question("q10", 0, [
       check("shape_slider_id_test", test_ids.shape_slider_id_test),
       check("speed_slider_id_test", test_ids.speed_slider_id_test),
+      check(
+        "speed_slider_maps_endpoints_without_changing_drawings_test",
+        app_controls.speed_slider_maps_endpoints_without_changing_drawings_test,
+      ),
+      check(
+        "shape_slider_changes_shape_without_changing_speed_test",
+        app_controls.shape_slider_changes_shape_without_changing_speed_test,
+      ),
     ]),
     question("q11", 0, [
       check("drawing_select_id_test", test_ids.drawing_select_id_test),
+      check(
+        "drawings_keep_independent_valid_and_invalid_source_test",
+        app_controls.drawings_keep_independent_valid_and_invalid_source_test,
+      ),
     ]),
     question("q12", 0, [
       check("extension_description_test", extension.description_test),

@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "gleam build --target=javascript && vite build",
-    "dev": "gleam build --target=javascript && vite"
+    "dev": "gleam build --target=javascript && vite",
+    "test": "gleam test -- q10 && gleam test -- q11 && node --test test/persistence.test.mjs"
   },
   "devDependencies": {
     "vite": "^5.4.21"

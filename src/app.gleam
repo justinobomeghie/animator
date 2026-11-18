@@ -53,7 +53,7 @@ pub type Model {
 }
 
 pub type Msg {
-  SetCode(String)
+  SetCode(String, String)
 
   // Layout controls
   ToggleCode
@@ -83,10 +83,11 @@ pub fn init(_flags: Nil) -> #(Model, Effect(Msg)) {
   let source = source_for(selected, library)
   #(
     Model(source:, code_open: True, output: "", shape_slider: 50, speed: 1.0, selected:, library:),
-    // Effects that happen automatically at the start go here.
+    // Bind editor changes to the drawing restored at startup. Saving the
+    // restored collection here also persists a migrated or repaired selection.
     effect.batch([
-      editor.mount(source, SetCode),
-      effect.from(fn(dispatch) { dispatch(SetCode(source)) }),
+      editor.mount(source, fn(text) { SetCode(selected, text) }),
+      persist(Model(source:, code_open: True, output: "", shape_slider: 50, speed: 1.0, selected:, library:)),
     ]),
   )
 }
@@ -161,7 +162,11 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     DrawingChanged(name) -> {
       let source = source_for(name, model.library)
       let next = Model(..model, selected: name, source:)
-      #(next, effect.batch([editor.mount(source, SetCode), draw_effect(next), persist(next)]))
+      #(next, effect.batch([
+        editor.mount(source, fn(text) { SetCode(name, text) }),
+        draw_effect(next),
+        persist(next),
+      ]))
     }
     NewDrawing -> {
       let name = string.trim(data.prompt_drawing_name())
@@ -170,7 +175,11 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         False -> {
           let library = list.append(model.library, [#(name, default_code)])
           let next = Model(..model, library:, selected: name, source: default_code)
-          #(next, effect.batch([editor.mount(default_code, SetCode), draw_effect(next), persist(next)]))
+          #(next, effect.batch([
+            editor.mount(default_code, fn(text) { SetCode(name, text) }),
+            draw_effect(next),
+            persist(next),
+          ]))
         }
       }
     }
@@ -178,16 +187,21 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     // After each keystroke in the editor, save the source even while it is
     // temporarily incomplete. Editors commonly pass through invalid syntax as
     // the user types, and that text must still survive a reload.
-    SetCode(text) -> {
+    SetCode(name, text) -> {
       let library = list.map(model.library, fn(d) {
-        case d.0 == model.selected {
+        case d.0 == name {
           True -> #(d.0, text)
           False -> d
         }
       })
-      let edited = Model(..model, source: text, library:)
+      let edited = case name == model.selected {
+        True -> Model(..model, source: text, library:)
+        False -> Model(..model, library:)
+      }
       let save = persist(edited)
-      case run_source(model.shape_slider, text) {
+      case name != model.selected {
+        True -> #(edited, save)
+        False -> case run_source(model.shape_slider, text) {
         // Parsed and evaluated: show the result.
         Ok(paths) -> #(
           Model(..edited, output: ""),
@@ -202,6 +216,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           Model(..edited, output: msg),
           save,
         )
+      }
       }
     }
   }
@@ -257,7 +272,9 @@ fn view_anim(model: Model) -> Element(Msg) {
   html.div([attr.class("canvas-area")], [
     view_reveal_code(model),
     html.div([attr.class("studio-controls")], [
-      html.select([attr.value(model.selected), attr.attribute("data-test-id", "drawing-select"), event.on_change(DrawingChanged)], list.map(model.library, fn(d) { html.option([attr.value(d.0)], d.0) })),
+      html.select([attr.attribute("data-test-id", "drawing-select"), event.on_change(DrawingChanged)], list.map(model.library, fn(d) {
+        html.option([attr.value(d.0), attr.selected(d.0 == model.selected)], d.0)
+      })),
       html.button([event.on_click(NewDrawing)], [html.text("New drawing")]),
       html.label([], [html.text("Shape"), html.span([attr.class("control-value")], [html.text(int.to_string(model.shape_slider))]), html.input([attr.type_("range"), attr.attribute("min", "0"), attr.attribute("max", "100"), attr.value(int.to_string(model.shape_slider)), attr.attribute("data-test-id", "shape-slider"), event.on_input(ShapeChanged)])]),
       html.label([], [html.text("Speed"), html.span([attr.class("control-value")], [html.text(float.to_string(model.speed) <> "×")]), html.input([attr.type_("range"), attr.attribute("min", "-3"), attr.attribute("max", "3"), attr.attribute("step", "0.1"), attr.value(float.to_string(model.speed)), attr.attribute("data-test-id", "speed-slider"), event.on_input(SpeedChanged)])]),
